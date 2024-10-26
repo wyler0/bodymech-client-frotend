@@ -1,3 +1,161 @@
+# TODO:
+
+- Authentication for mobile (android and ios)
+- - not setup nor tested
+- - Firebase requires app store bundle IDs and such which won't happen until I do ios deployment on device 
+- - need to update login/register calls, add certs, update types in api/types/firebase.ts
+
+# Views
+
+## Growth Dashboard
+
+The growth dashboard is the homepage for the user. It displays the user's progress and goals.
+
+## Routine Dashboard
+
+The routine dashboard is a list of exercises that the user can select to view more information about.
+
+### Navigation
+- Implemented in `app/(tabs)/(routine dashboard)/_layout.tsx`
+- Uses Stack navigation for routine dashboard and exercise details
+- Custom headers:
+  - Main dashboard titled "Routine Dashboard"
+  - Exercise screens dynamically titled based on the specific exercise
+  - Simplified back navigation (arrow only, no text)
+
+## Chat
+
+The app features a two-level chat system, consisting of a conversations list and individual chat screens.
+
+### Conversations List
+- Located in `app/(tabs)/(conversations)/index.tsx`
+- Displays all user conversations, showing:
+  - Contact name
+  - Last message preview
+  - Timestamp (using a custom relative time format)
+  - Unread message count (if applicable)
+
+### Individual Chat Screen
+- Found in `app/(tabs)/(conversations)/chat/[id].tsx`
+- Utilizes React Native Gifted Chat for the chat interface
+- Supports text messages and image sharing
+- Handles both existing conversations and new chat creation
+
+### New Chat Creation
+- Implemented via a popover interface (`NewChatPopover.tsx`)
+- Allows user selection and initial message composition
+- Seamlessly integrates with the existing chat system
+
+### Custom Utilities
+- `formatRelativeTime` function: Provides human-readable relative timestamps without external dependencies
+
+## Profile Management
+
+- User profile information display and management (`app/(tabs)/(profile)/index.tsx`)
+- Fetches and displays user data from Firestore
+- Provides logout functionality
+
+
+
+# Architecture and Implementation
+
+## Environment Configuration
+
+Environment variables are configured in `app.json` under the `extra` field.
+
+```json:app.json
+     {
+       "expo": {
+         "extra": {
+           "apiUrl": "https://api.yourapp.com",
+           "useSampleData": true,
+           "firebaseConfig": {
+             ...
+           }
+         }
+       }
+     }
+```
+## Data Management
+
+- Firestore used for storing user data and potentially chat messages
+- Firebase configuration securely stored in `app.json`
+
+## Authentication
+
+Authentication is implemented using Firebase. Packages `firebase-react-native` and `firebase` are both used.
+
+### Platform Compatibility
+- `firebase.js`:
+  - Handles platform compatibility via platform checks (iOS, android, web), ensuring that the correct Firebase configuration and authentication functions are used for each platform.
+- `app.json`:
+  - Added platform-specific Firebase configurations under `expo.extra.firebaseConfig`.
+  - Separate configurations for web, iOS, and Android.
+
+### Registration and Authentication Implementation
+
+1. Root Layout (`app/_layout.tsx`):
+   - Implemented a check for user authentication status using Firebase's `onAuthStateChanged`.
+   - Added conditional rendering to show either the login/register screens or the main app based on authentication status.
+
+2. Login Layout (`app/(login)/_layout.tsx`):
+   - Created a stack navigator for login-related screens (login and register).
+
+3. Registration Page (`app/(login)/register.tsx`):
+   - Implemented a registration form with email and password fields.
+   - Used Firebase's `createUserWithEmailAndPassword` for user registration.
+   - Added error handling and display for registration failures.
+   - Included navigation back to the login page.
+
+4. Login Page (`app/(login)/index.tsx`):
+   - Implemented a login form with email and password fields.
+   - Used Firebase's `signInWithEmailAndPassword` for user authentication.
+   - Added error handling and display for login failures.
+   - Included navigation to the registration page.
+
+5. Authentication Flow:
+   - On successful login or registration, Firebase automatically updates the auth state.
+   - The root layout listens for auth state changes and redirects to the main app when authenticated.
+
+6. Error Handling:
+   - Implemented basic error handling for login and registration processes.
+   - Displayed user-friendly error messages on the respective screens.
+
+7. Navigation:
+   - Utilized Expo Router for navigation between login and registration screens.
+   - Implemented automatic redirection to the main app upon successful authentication.
+
+9. Typing:
+   - Custom types are defined in `api/types/firebase.ts` due to mobile vs web firebase imports differing. 
+
+These implementations create a secure and user-friendly authentication flow, integrating Firebase for user management and leveraging Expo Router for seamless navigation.
+
+### Firebase Authentication Persistence
+
+Firebase handles authentication persistence automatically.
+
+
+## Navigation and Routing
+
+The app uses Expo Router for navigation, providing a file-system based routing approach.
+
+- Dynamic header titles for chat screens (`app/(tabs)/(conversations)/_layout.tsx`)
+- Custom ChatHeader component for displaying avatar and name in chat headers
+- TypeScript integration for route params to ensure type safety
+
+
+## Patches
+
+Patches folder contains changes made to internal packages for compatibility with all supported platforms (e.g., web, iOS, Android). 
+
+1. Alert
+   - alert.js patches the expo-router alert package to add web compatibility.
+   - Usage:
+     ```typescript
+     import alert from '../patches/alert';
+     alert('Title', 'Description');
+     ```
+
 ## API Standardization and React Query Integration
 
 This section outlines the approach for managing API interactions in the Expo app using React Query.
@@ -60,7 +218,10 @@ This section outlines the approach for managing API interactions in the Expo app
        "expo": {
          "extra": {
            "apiUrl": "https://api.yourapp.com",
-           "useSampleData": true
+           "useSampleData": true,
+           "firebaseConfig": {
+             ...
+           }
          }
        }
      }
@@ -73,54 +234,3 @@ This section outlines the approach for managing API interactions in the Expo app
      const useSampleData = Constants.expoConfig?.extra?.useSampleData;
      ```
 
-# Views
-
-## Chat Implementation
-
-- Implemented a two-level chat system with a conversations list and individual chat screens.
-- Used Expo Router for navigation between screens.
-
-### Conversations List
-- Located in `app/(tabs)/(conversations)/index.tsx`
-- Displays a list of all conversations
-- Each item shows:
-  - Contact name
-  - Last message
-  - Timestamp (relative time using a custom formatting function)
-  - Unread message count (if any)
-- Tapping an item navigates to the individual chat screen
-
-### Custom Utilities
-- Implemented a custom `formatRelativeTime` function to display relative timestamps without relying on external libraries
-
-### Individual Chat Screen
-- Located in `app/(tabs)/(conversations)/chat/[id].tsx`
-- Uses React Native Gifted Chat for the chat interface
-- Allows sending text messages and images
-- Starts with an empty chat if no existing conversation is found or for new chats
-- Loads the last message from the conversation data if an existing conversation is found
-
-### New Chat Creation
-- a new chat creation flow using a popover
-- `NewChatPopover.tsx` for selecting a recipient and composing the first message
-- `index.tsx` in the conversations tab to use the new popover
-- `chat/[id].tsx` to handle new chat creation and display the first message
-
-### Navigation and Routing
-- Used Expo Router for navigation between screens
-- Implemented dynamic header titles for chat screens in `app/(tabs)/(conversations)/_layout.tsx`
-- Chat screen headers now display the avatar and name of the conversation partner
-- Created a custom ChatHeader component to show avatar and name in the header
-- Added proper TypeScript typing for route params to ensure type safety
-- Customized the back navigation for chat screens to show only the back arrow without text
-
-# Routine Dashboard
-### Routine Dashboard Navigation
-- Implemented in `app/(tabs)/(routine dashboard)/_layout.tsx`
-- Uses Stack navigation for moving between routine dashboard and individual exercise details
-- Customized headers:
-  - Routine Dashboard shows "Routine Dashboard" as the title
-  - Exercise detail views show the name of the specific exercise
-  - Back navigation shows only the arrow without text
-- Dynamic title setting for exercise screens based on the exercise data
-- Proper TypeScript typing for route params to ensure type safety
