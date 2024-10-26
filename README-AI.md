@@ -52,13 +52,7 @@ This section outlines the approach for managing API interactions in the Expo app
        // ... more sample exercises
      ];
      ```
-
-8. Additional Considerations:
-   - Environment Configuration: Separate file for environment-specific settings
-   - Authentication: Implement auth service and related hooks if required
-   - Interceptors: Add for token management, etc.
-   - Caching Strategies: Define consistent approaches across queries
-
+   
 9. Environment Configuration:
    - Use app.json and expo-constants for environment-specific configurations:
      ```json:app.json
@@ -79,4 +73,55 @@ This section outlines the approach for managing API interactions in the Expo app
      const useSampleData = Constants.expoConfig?.extra?.useSampleData;
      ```
 
-This structure provides a standardized approach to API interactions, leveraging React Query for efficient data management and Pydantic-based typing for consistency with the backend. The addition of sample data allows for easier development and testing of UI components when the API is not available or still in development.
+# Views
+
+## Chat Implementation
+
+- Implemented a two-level chat system with a conversations list and individual chat screens.
+- Used Expo Router for navigation between screens.
+
+### Conversations List
+- Located in `app/(tabs)/(conversations)/index.tsx`
+- Displays a list of all conversations
+- Each item shows:
+  - Contact name
+  - Last message
+  - Timestamp (relative time using a custom formatting function)
+  - Unread message count (if any)
+- Tapping an item navigates to the individual chat screen
+
+### Custom Utilities
+- Implemented a custom `formatRelativeTime` function to display relative timestamps without relying on external libraries
+
+### Individual Chat Screen
+- Located in `app/(tabs)/(conversations)/chat/[id].tsx`
+- Uses React Native Gifted Chat for the chat interface
+- Allows sending text messages and images
+- Starts with an empty chat if no existing conversation is found or for new chats
+- Loads the last message from the conversation data if an existing conversation is found
+
+### Future Improvements
+- Implement real-time message updates using WebSockets or a real-time database
+- Add user authentication and link conversations to user accounts
+- Implement message persistence using local storage or a backend database
+- Add support for more message types (voice, video, documents)
+- Implement read receipts and typing indicators
+
+### Navigation and Routing
+- Used Expo Router for navigation between screens
+- Implemented dynamic header titles for chat screens in `app/(tabs)/(conversations)/_layout.tsx`
+- Chat screen headers now display the avatar and name of the conversation partner
+- Created a custom ChatHeader component to show avatar and name in the header
+- Added proper TypeScript typing for route params to ensure type safety
+- Customized the back navigation for chat screens to show only the back arrow without text
+
+# Routine Dashboard
+### Routine Dashboard Navigation
+- Implemented in `app/(tabs)/(routine dashboard)/_layout.tsx`
+- Uses Stack navigation for moving between routine dashboard and individual exercise details
+- Customized headers:
+  - Routine Dashboard shows "Routine Dashboard" as the title
+  - Exercise detail views show the name of the specific exercise
+  - Back navigation shows only the arrow without text
+- Dynamic title setting for exercise screens based on the exercise data
+- Proper TypeScript typing for route params to ensure type safety
