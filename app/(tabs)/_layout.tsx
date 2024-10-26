@@ -25,7 +25,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="(chat)"
+        name="(conversations)"
         options={{
           tabBarIcon: ({ color, size }) => (
             <Icon name="message" color={color} size={size} />
