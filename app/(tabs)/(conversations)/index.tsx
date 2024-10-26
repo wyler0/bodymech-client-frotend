@@ -1,7 +1,10 @@
-import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
-import { Link } from 'expo-router';
+import React, { useState } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+//import { Picker } from '@react-native-picker/picker';
+import { Link, useRouter } from 'expo-router';
 import { sampleConversations } from '@/api/sample-data/conversations';
+import { AntDesign } from '@expo/vector-icons';
+import NewChatPopover from './NewChatPopover';
 
 function formatRelativeTime(date: Date): string {
   const now = new Date();
@@ -16,6 +19,11 @@ function formatRelativeTime(date: Date): string {
 }
 
 export default function ConversationsScreen() {
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState('');
+  const router = useRouter();
+  const [isNewChatVisible, setNewChatVisible] = useState(false);
+
   const renderItem = ({ item }: { item: typeof sampleConversations[0] }) => (
     <Link href={`/(tabs)/(conversations)/chat/${item.id}`} asChild>
       <TouchableOpacity style={styles.conversationItem}>
@@ -38,12 +46,33 @@ export default function ConversationsScreen() {
     </Link>
   );
 
+  const handleNewChat = () => {
+    if (selectedUser) {
+      router.push({
+        pathname: '/chat/[id]',
+        params: { id: 'new', user: selectedUser }
+      });
+      setModalVisible(false);
+      setSelectedUser('');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <FlatList
         data={sampleConversations}
         renderItem={renderItem}
         keyExtractor={item => item.id}
+      />
+      <TouchableOpacity
+        style={styles.newChatButton}
+        onPress={() => setNewChatVisible(true)}
+      >
+        <AntDesign name="plus" size={24} color="white" />
+      </TouchableOpacity>
+      <NewChatPopover
+        isVisible={isNewChatVisible}
+        onClose={() => setNewChatVisible(false)}
       />
     </View>
   );
@@ -107,5 +136,70 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 12,
     fontWeight: 'bold',
+  },
+  newChatButton: {
+    position: 'absolute',
+    right: 20,
+    bottom: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#0084ff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  modalTitle: {
+    marginBottom: 15,
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  picker: {
+    width: 200,
+    height: 50,
+  },
+  startChatButton: {
+    backgroundColor: '#0084ff',
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+    marginTop: 15,
+  },
+  startChatButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#f0f0f0',
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+    marginTop: 10,
+  },
+  cancelButtonText: {
+    color: '#333',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });

@@ -7,31 +7,41 @@ import { useLocalSearchParams } from 'expo-router';
 import { sampleConversations } from '@/api/sample-data/conversations';
 
 export default function ChatScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, isNew, firstMessage } = useLocalSearchParams<{ id: string; isNew: string; firstMessage: string }>();
   const [messages, setMessages] = useState<IMessage[]>([]);
 
   useEffect(() => {
-    // Find the conversation in the sample data
     const conversation = sampleConversations.find(c => c.id === id);
     
-    // Set initial message based on the conversation, or leave it empty if no conversation found
     if (conversation) {
-      setMessages([
-        {
-          _id: 1,
-          text: conversation.lastMessage,
-          createdAt: new Date(conversation.timestamp),
-          user: {
-            _id: 2,
-            name: conversation.name,
-            avatar: 'https://avatars.githubusercontent.com/u/388375?s=48&v=4',
+      if (isNew === 'true' && firstMessage) {
+        setMessages([
+          {
+            _id: 1,
+            text: firstMessage,
+            createdAt: new Date(),
+            user: {
+              _id: 1,
+              name: 'You',
+            },
           },
-        },
-      ]);
-    } else {
-      setMessages([]);
+        ]);
+      } else {
+        setMessages([
+          {
+            _id: 1,
+            text: `Hello! This is the start of your conversation with ${conversation.name}.`,
+            createdAt: new Date(),
+            user: {
+              _id: 2,
+              name: conversation.name,
+              avatar: conversation.avatar,
+            },
+          },
+        ]);
+      }
     }
-  }, [id]);
+  }, [id, isNew, firstMessage]);
 
   const onSend = useCallback((newMessages: IMessage[] = []) => {
     setMessages(previousMessages =>

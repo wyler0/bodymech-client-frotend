@@ -100,12 +100,11 @@ This section outlines the approach for managing API interactions in the Expo app
 - Starts with an empty chat if no existing conversation is found or for new chats
 - Loads the last message from the conversation data if an existing conversation is found
 
-### Future Improvements
-- Implement real-time message updates using WebSockets or a real-time database
-- Add user authentication and link conversations to user accounts
-- Implement message persistence using local storage or a backend database
-- Add support for more message types (voice, video, documents)
-- Implement read receipts and typing indicators
+### New Chat Creation
+- a new chat creation flow using a popover
+- `NewChatPopover.tsx` for selecting a recipient and composing the first message
+- `index.tsx` in the conversations tab to use the new popover
+- `chat/[id].tsx` to handle new chat creation and display the first message
 
 ### Navigation and Routing
 - Used Expo Router for navigation between screens
