@@ -30,8 +30,10 @@ export default function Index() {
     }
     
     if (isAuthenticated) {
+        // Redirect to the growth dashboard when authenticated
         return <Redirect href="/(tabs)/(growth dashboard)" />;
     } else {
+        // Redirect to login when not authenticated
         return <Redirect href="/(login)" />;
     }
 }

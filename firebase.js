@@ -1,33 +1,22 @@
 // Import the functions you need from the SDKs you need
 import { Platform } from 'react-native';
-import Constants from 'expo-constants';
 
 let app, auth, firestore;
-
-// Get the Firebase configuration from app.json
-const firebaseConfig = {
-  apiKey: Constants.expoConfig?.extra?.firebaseConfig?.FIREBASE_API_KEY,
-  authDomain: Constants.expoConfig?.extra?.firebaseConfig?.FIREBASE_AUTH_DOMAIN,
-  projectId: Constants.expoConfig?.extra?.firebaseConfig?.FIREBASE_PROJECT_ID,
-  storageBucket: Constants.expoConfig?.extra?.firebaseConfig?.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: Constants.expoConfig?.extra?.firebaseConfig?.FIREBASE_MESSAGING_SENDER_ID,
-  appId: Constants.expoConfig?.extra?.firebaseConfig?.FIREBASE_APP_ID,
-  measurementId: Constants.expoConfig?.extra?.firebaseConfig?.FIREBASE_MEASUREMENT_ID,
-  databaseURL: Constants.expoConfig?.extra?.firebaseConfig?.FIREBASE_DATABASE_URL,
-};
-
-// Check if all required Firebase config values are present
-const isFirebaseConfigValid = Object.values(firebaseConfig).every(value => value !== undefined && value !== null);
-
-if (!isFirebaseConfigValid) {
-  console.error('Firebase configuration is incomplete:', firebaseConfig);
-  throw new Error('Firebase configuration is incomplete. Check your app.json file.');
-}
 
 let firebaseInitialized = false;
 
 // Initialize Firebase. Requires separate import for web and native, as firebase library and setups are different for each.
 const firebaseInitializationPromise = new Promise((resolve) => {
+  const firebaseConfig = {
+    apiKey: "AIzaSyDDoY2mB3tR2J-QbwihPJLoSH3ya9CBRrY",
+    authDomain: "mech-2b0ad.firebaseapp.com",
+    projectId: "mech-2b0ad",
+    storageBucket: "mech-2b0ad.appspot.com",
+    messagingSenderId: "396836920221",
+    appId: "1:396836920221:web:ff4b5759f0dad6960fed74",
+    measurementId: "G-SE4L1C13PR",
+    databaseURL: "https://default.nam5.firebasedatabase.app",
+  };
   if (Platform.OS === 'web') {
     // Web Firebase import
     import('firebase/app').then((firebase) => {
