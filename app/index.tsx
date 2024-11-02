@@ -1,23 +1,30 @@
 import { Redirect } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { View, Text } from 'react-native';
-import { getAuth } from '../firebase';
+import { getAuthInstance } from '../firebase';
 import { FirebaseUser } from '../api/types/firebase';
 
 // Used to set the default route to the growth dashboard
 export default function Index() {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
     useEffect(() => {
-        const authInstance = getAuth();
-        if (authInstance) {
-            const unsubscribe = authInstance.onAuthStateChanged((user: FirebaseUser | null) => {
-                setIsAuthenticated(!!user);
-            });
-            return unsubscribe;
-        } else {
-            console.error('Auth instance not found');
-        }
+        const setupAuth = async () => {
+            try {
+                const authInstance = await getAuthInstance();
+                const unsubscribe = authInstance.onAuthStateChanged((user: FirebaseUser | null) => {
+                    setIsAuthenticated(!!user);
+                });
+                return unsubscribe;
+            } catch (error) {
+                console.error('Auth setup failed:', error);
+                setIsAuthenticated(false);
+            }
+        };
+
+        const unsubscribePromise = setupAuth();
+        return () => {
+            unsubscribePromise.then(unsubscribe => unsubscribe?.());
+        };
     }, []);
 
     if (isAuthenticated === null) {

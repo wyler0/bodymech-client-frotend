@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "396836920221",
+    "project_id": "mech-2b0ad",
+    "storage_bucket": "mech-2b0ad.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:396836920221:android:5138d3a73d5d79a20fed74",
+        "android_client_info": {
+          "package_name": "com.wylerzahm.bodymech"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "396836920221-djo6jko5nekuuvc7qmuj97nqucqkg63m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNyegImea6hVSR8zuUfUaMsuf34L3JmBg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "396836920221-djo6jko5nekuuvc7qmuj97nqucqkg63m.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "396836920221-7tl9i2ivri3044su5hf107f9356chheb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.wylerzahm.bodymech"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

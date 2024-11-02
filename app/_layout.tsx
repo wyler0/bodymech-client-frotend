@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import { View, Text } from 'react-native';
-import { initializeFirebase } from '../firebase';
+import { getAuthInstance } from '../firebase';
 
 export default function RootLayout() {
   const [isFirebaseReady, setIsFirebaseReady] = useState(false);
 
   useEffect(() => {
     async function setup() {
-      await initializeFirebase();
+      await getAuthInstance();
       setIsFirebaseReady(true);
     }
     setup();

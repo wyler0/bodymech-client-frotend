@@ -7,19 +7,28 @@
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
+    "platforms": [
+      "ios",
+      "web"
+    ],
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.wylerzahm.bodymech",
+      "googleServicesFile": "GoogleService-Info.plist",
+      "minVersion": "12.0"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "googleServicesFile": "google-services.json",
+      "package": "com.wylerzahm.bodymech"
     },
     "web": {
       "bundler": "metro",
@@ -36,7 +45,7 @@
         {
           "ios": {
             "useFrameworks": "static",
-            "faceIdPermissions": "Allow $(PRODUCT_NAME) to access your Face ID biometric data."
+            "faceIdPermissions": "Allow us to access your Face ID."
           }
         }
       ],

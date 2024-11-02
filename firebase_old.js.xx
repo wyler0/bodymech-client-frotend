@@ -8,9 +8,7 @@ import {
   getFirestore, 
   doc, 
   setDoc, 
-  getDoc,
-  initializeFirestore,
-  CACHE_SIZE_UNLIMITED
+  getDoc 
 } from 'firebase/firestore';
 
 let app, auth, firestore;
@@ -32,9 +30,7 @@ const initializeFirebase = async () => {
   
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
-  firestore = initializeFirestore(app, {
-    cacheSizeBytes: CACHE_SIZE_UNLIMITED
-  });
+  firestore = getFirestore(app);
   firebaseInitialized = true;
 };
 
