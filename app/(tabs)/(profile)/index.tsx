@@ -1,19 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Button, ActivityIndicator } from 'react-native';
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
 import { useRouter } from 'expo-router';
 import alert from '../../../patches/alert';
-import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
-
-const usersCollection = firestore().collection('users');
-
-interface UserData {
-  email: string;
-  firstname: string;
-  lastname: string;
-  createdAt: FirebaseFirestoreTypes.Timestamp;
-}
+import firebaseService from '../../../api/firebase';
+import { UserData } from '../../../api/firebase';
 
 export default function ProfileScreen() {
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -21,7 +11,7 @@ export default function ProfileScreen() {
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = auth().onAuthStateChanged((user) => {
+    const unsubscribe = firebaseService.auth.onAuthStateChanged((user) => {
       if (user) {
         fetchUserData(user.uid);
       } else {
@@ -36,11 +26,9 @@ export default function ProfileScreen() {
   const fetchUserData = async (uid: string) => {
     try {
       console.log('Fetching user data for UID:', uid);
-      const userDoc = await usersCollection.doc(uid).get();
+      const data = await firebaseService.firestore.getUserData(uid);
       
-      console.log('Document exists:', userDoc.exists);
-      if (userDoc.exists) {
-        const data = userDoc.data();
+      if (data) {
         console.log('User data:', data);
         setUserData(data as UserData);
       } else {
@@ -56,7 +44,7 @@ export default function ProfileScreen() {
 
   const handleLogout = async () => {
     try {
-      await auth().signOut();
+      await firebaseService.auth.signOut();
       router.replace('/(login)');
     } catch (error) {
       console.error('Error logging out:', error);

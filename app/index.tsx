@@ -1,14 +1,14 @@
 import { Redirect } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { View, Text } from 'react-native';
-import auth from '@react-native-firebase/auth';
-import { FirebaseUser } from '../api/types/firebase';
+import firebaseService from '../api/firebase';
+import { AuthUser } from '../api/firebase';
 
 // Used to set the default route to the growth dashboard
 export default function Index() {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
     useEffect(() => {
-        const unsubscribe = auth().onAuthStateChanged((user: FirebaseUser | null) => {
+        const unsubscribe = firebaseService.auth.onAuthStateChanged((user: AuthUser | null) => {
             setIsAuthenticated(!!user);
         });
         

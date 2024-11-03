@@ -92,6 +92,22 @@ Authentication is implemented using Firebase. Packages `firebase-react-native` a
 
 ### Registration and Authentication Implementation
 
+Authentication in the application works as follows:
+
+1. The application uses a platform-specific Firebase implementation that automatically switches between:
+   - React Native Firebase SDK for mobile platforms (iOS/Android)
+   - Web Firebase SDK for web platform
+
+2. A Firebase service abstraction layer (`api/firebase/index.ts`) provides a unified interface for both platforms, handling:
+   - Authentication operations (sign in, sign up, sign out)
+   - User state management
+   - Firestore operations
+
+3. The abstraction layer uses React Native's Platform.select() to automatically choose the correct implementation at runtime, making the platform-specific code completely transparent to the rest of the application.
+
+4. All Firebase operations are accessed through this abstraction layer, ensuring consistent behavior across platforms while maintaining platform-specific optimizations.
+
+### Authentication Flow
 1. Root Layout (`app/_layout.tsx`):
    - Implemented a check for user authentication status using Firebase's `onAuthStateChanged`.
    - Added conditional rendering to show either the login/register screens or the main app based on authentication status.
