@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet, Text, Alert } from 'react-native';
+import auth from '@react-native-firebase/auth';
 
 import alert from '../../patches/alert';
-import { loginUser } from '../../firebase';
 import { useRouter } from 'expo-router';
 
 export default function Login() {
@@ -12,10 +12,16 @@ export default function Login() {
 
   const handleLogin = async () => {
     try {
-      await loginUser(email, password);
-      // Login successful, redirect to the growth dashboard
+      if (!email || !password) {
+        alert('Error', 'Please enter both email and password');
+        return;
+      }
+      
+      await auth().signInWithEmailAndPassword(email, password);
+      console.log('Login successful');
       router.replace('/(tabs)/(growth dashboard)');
     } catch (error) {
+      console.error('Login error:', error);
       alert('Login Failed', 'Invalid email or password. Please try again.');
     }
   };

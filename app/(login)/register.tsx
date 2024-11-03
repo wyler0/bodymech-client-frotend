@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, Alert } from 'react-native';
-
+import { View, TextInput, Button, StyleSheet } from 'react-native';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 import alert from '../../patches/alert';
-import { registerUser, createUserInFirestore } from '../../firebase';
 import { useRouter } from 'expo-router';
 
 export default function Register() {
@@ -12,8 +12,20 @@ export default function Register() {
 
   const register = async () => {
     try {
-      const user = await registerUser(email, password);
-      await createUserInFirestore(user, { firstname: 'John', lastname: 'Doe' });
+      // Create auth user
+      const userCredential = await auth().createUserWithEmailAndPassword(email, password);
+      
+      // Create user document in Firestore
+      await firestore()
+        .collection('users')
+        .doc(userCredential.user.uid)
+        .set({
+          email: userCredential.user.email,
+          firstname: 'John',
+          lastname: 'Doe',
+          createdAt: firestore.FieldValue.serverTimestamp(),
+        });
+
       alert('Success', 'User account created & signed in!');
       // Registration successful, user will be automatically redirected to the main app
     } catch (error) {

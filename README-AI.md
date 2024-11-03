@@ -83,11 +83,9 @@ Environment variables are configured in `app.json` under the `extra` field.
 
 ## Authentication
 
-Authentication is implemented using Firebase. Packages `firebase-react-native` and `firebase` are both used.
+Authentication is implemented using Firebase. Packages `firebase-react-native` and other react-native firebase packages are used.
 
 ### Platform Compatibility
-- `firebase.js`:
-  - Handles platform compatibility via platform checks (iOS, android, web), ensuring that the correct Firebase configuration and authentication functions are used for each platform.
 - `app.json`:
   - Added platform-specific Firebase configurations under `expo.extra.firebaseConfig`.
   - Separate configurations for web, iOS, and Android.
