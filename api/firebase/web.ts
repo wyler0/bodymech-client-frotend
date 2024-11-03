@@ -13,19 +13,18 @@ import {
   getDoc,
   collection,
 } from 'firebase/firestore';
-import { FirebaseService, AuthUser } from './index';
-import Constants from 'expo-constants';
+import { FirebaseService } from './index';
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDDoY2mB3tR2J-QbwihPJLoSH3ya9CBRrY",
-    authDomain: "mech-2b0ad.firebaseapp.com",
-    projectId: "mech-2b0ad",
-    storageBucket: "mech-2b0ad.appspot.com",
-    messagingSenderId: "396836920221",
-    appId: "1:396836920221:web:ff4b5759f0dad6960fed74",
-    measurementId: "G-SE4L1C13PR",
-    databaseURL: "https://default.nam5.firebasedatabase.app"
-}
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
+  databaseURL: process.env.EXPO_PUBLIC_FIREBASE_DATABASE_URL,
+};
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

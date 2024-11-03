@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Button, ActivityIndicator } from 'react-native'
 import { useRouter } from 'expo-router';
 import alert from '../../../patches/alert';
 import firebaseService from '../../../api/firebase';
-import { UserData } from '../../../api/firebase';
+import { UserData } from '../../../api/types/firebase';
 
 export default function ProfileScreen() {
   const [userData, setUserData] = useState<UserData | null>(null);

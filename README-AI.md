@@ -1,9 +1,8 @@
 # TODO:
 
-- Authentication for mobile (android and ios)
-- - not setup nor tested
-- - Firebase requires app store bundle IDs and such which won't happen until I do ios deployment on device 
-- - need to update login/register calls, add certs, update types in api/types/firebase.ts
+- Authentication testing
+  - On both mobile and web, need to confirm if credentials expire the user is logged out and redirected to the login screen automatically.
+  - Security audit
 
 # Views
 
@@ -50,12 +49,10 @@ The app features a two-level chat system, consisting of a conversations list and
 - `formatRelativeTime` function: Provides human-readable relative timestamps without external dependencies
 
 ## Profile Management
-
 - User profile information display and management (`app/(tabs)/(profile)/index.tsx`)
 - Fetches and displays user data from Firestore
 - Provides logout functionality
-
-
+- See [here](#user-data-structure) for more details.
 
 # Architecture and Implementation
 
@@ -76,6 +73,32 @@ Environment variables are configured in `app.json` under the `extra` field.
        }
      }
 ```
+And also in constants
+
+   - Use app.json and expo-constants for environment-specific configurations:
+     ```json:app.json
+     {
+       "expo": {
+         "extra": {
+           "apiUrl": "https://api.yourapp.com",
+           "useSampleData": true,
+           "firebaseConfig": {
+             ...
+           }
+         }
+       }
+     }
+     ```
+     Access in code: 
+     ```typescript
+     import Constants from 'expo-constants';
+     
+     const apiUrl = Constants.expoConfig?.extra?.apiUrl;
+     const useSampleData = Constants.expoConfig?.extra?.useSampleData;
+     ```
+
+
+
 ## Data Management
 
 - Firestore used for storing user data and potentially chat messages
@@ -83,71 +106,104 @@ Environment variables are configured in `app.json` under the `extra` field.
 
 ## Authentication
 
-Authentication is implemented using Firebase. Packages `firebase-react-native` and other react-native firebase packages are used.
+Authentication in the application is implemented using Firebase with platform-specific SDKs and a unified abstraction layer. The system handles both web and mobile platforms differently while maintaining consistent behavior.
 
-### Platform Compatibility
-- `app.json`:
-  - Added platform-specific Firebase configurations under `expo.extra.firebaseConfig`.
-  - Separate configurations for web, iOS, and Android.
+### Platform-Specific Implementation
 
-### Registration and Authentication Implementation
+1. **Service Abstraction Layer**
+   - Located in `api/firebase/index.ts`
+   - Defines common interfaces for auth and firestore operations
+   - Uses React Native's Platform.select() to automatically choose the correct implementation:
+     - Web: Uses Firebase Web SDK
+     - Mobile: Uses React Native Firebase SDK
 
-Authentication in the application works as follows:
+2. **Web Implementation** (`api/firebase/web.ts`)
+   - Uses Firebase Web SDK (`firebase/auth` and `firebase/firestore`)
+   - Implements authentication using web-specific methods
+   - Handles Firestore operations using web SDK's document references
 
-1. The application uses a platform-specific Firebase implementation that automatically switches between:
-   - React Native Firebase SDK for mobile platforms (iOS/Android)
-   - Web Firebase SDK for web platform
-
-2. A Firebase service abstraction layer (`api/firebase/index.ts`) provides a unified interface for both platforms, handling:
-   - Authentication operations (sign in, sign up, sign out)
-   - User state management
-   - Firestore operations
-
-3. The abstraction layer uses React Native's Platform.select() to automatically choose the correct implementation at runtime, making the platform-specific code completely transparent to the rest of the application.
-
-4. All Firebase operations are accessed through this abstraction layer, ensuring consistent behavior across platforms while maintaining platform-specific optimizations.
+3. **Mobile Implementation** (`api/firebase/mobile.ts`)
+   - Uses React Native Firebase SDK (`@react-native-firebase/auth` and `@react-native-firebase/firestore`)
+   - Implements native authentication methods
+   - Uses native Firestore operations for better mobile performance
 
 ### Authentication Flow
-1. Root Layout (`app/_layout.tsx`):
-   - Implemented a check for user authentication status using Firebase's `onAuthStateChanged`.
-   - Added conditional rendering to show either the login/register screens or the main app based on authentication status.
 
-2. Login Layout (`app/(login)/_layout.tsx`):
-   - Created a stack navigator for login-related screens (login and register).
+1. **Initial Auth Check** (`app/index.tsx`)
+   - Implements an auth state listener using `firebaseService.auth.onAuthStateChanged`
+   - Shows loading state while checking authentication
+   - Redirects to:
+     - Growth dashboard if authenticated
+     - Login screen if not authenticated
 
-3. Registration Page (`app/(login)/register.tsx`):
-   - Implemented a registration form with email and password fields.
-   - Used Firebase's `createUserWithEmailAndPassword` for user registration.
-   - Added error handling and display for registration failures.
-   - Included navigation back to the login page.
+2. **Login Process**
+   - Managed through `app/(login)/index.tsx`
+   - Uses platform-specific Firebase authentication
+   - Handles validation and error states
+   - Redirects to main app on successful login
 
-4. Login Page (`app/(login)/index.tsx`):
-   - Implemented a login form with email and password fields.
-   - Used Firebase's `signInWithEmailAndPassword` for user authentication.
-   - Added error handling and display for login failures.
-   - Included navigation to the registration page.
+3. **Registration Process**
+   - Implemented in `app/(login)/register.tsx`
+   - Creates both authentication and Firestore user records
+   - Uses batch writes for atomic operations
+   - Stores initial user data:
+     - Email
+     - Default first/last name
+     - Creation timestamp
+     - Last login timestamp
 
-5. Authentication Flow:
-   - On successful login or registration, Firebase automatically updates the auth state.
-   - The root layout listens for auth state changes and redirects to the main app when authenticated.
+4. **Profile Management**
+   - Profile data management in `app/(tabs)/(profile)/index.tsx`
+   - Fetches user data from Firestore on component mount
+   - Displays user information:
+     - Name (first/last)
+     - Email
+     - Account creation date
+   - Handles logout functionality
 
-6. Error Handling:
-   - Implemented basic error handling for login and registration processes.
-   - Displayed user-friendly error messages on the respective screens.
+### User Data Structure
 
-7. Navigation:
-   - Utilized Expo Router for navigation between login and registration screens.
-   - Implemented automatic redirection to the main app upon successful authentication.
+```typescript
+interface UserData {
+email: string;
+firstname: string;
+lastname: string;
+createdAt: FirebaseTimestamp;
+}
+```
+### Firebase Service Interface
+```typescript
+interface FirebaseService {
+auth: {
+signIn: (email: string, password: string) => Promise<void>;
+signUp: (email: string, password: string) => Promise<AuthUser>;
+signOut: () => Promise<void>;
+onAuthStateChanged: (callback: (user: AuthUser | null) => void) => () => void;
+getCurrentUser: () => AuthUser | null;
+};
+firestore: {
+createUser: (uid: string, userData: any) => Promise<void>;
+getUserData: (uid: string) => Promise<any>;
+updateUser: (uid: string, userData: any) => Promise<void>;
+};
+}
+```
+### Navigation Flow
 
-9. Typing:
-   - Custom types are defined in `api/types/firebase.ts` due to mobile vs web firebase imports differing. 
+1. **Login Layout** (`app/(login)/_layout.tsx`)
+   - Stack navigator for authentication screens
+   - Manages navigation between login and registration
 
-These implementations create a secure and user-friendly authentication flow, integrating Firebase for user management and leveraging Expo Router for seamless navigation.
+2. **Protected Routes**
+   - All routes under `(tabs)` are protected
+   - Automatic redirection to login if authentication is lost
+   - Profile section shows user data when authenticated
 
-### Firebase Authentication Persistence
+### Error Handling
 
-Firebase handles authentication persistence automatically.
-
+- Comprehensive error handling for authentication operations
+- Platform-specific error messages for better user experience
+- Unified error presentation using custom alert system
 
 ## Navigation and Routing
 
@@ -224,27 +280,3 @@ This section outlines the approach for managing API interactions in the Expo app
        // ... more sample exercises
      ];
      ```
-   
-9. Environment Configuration:
-   - Use app.json and expo-constants for environment-specific configurations:
-     ```json:app.json
-     {
-       "expo": {
-         "extra": {
-           "apiUrl": "https://api.yourapp.com",
-           "useSampleData": true,
-           "firebaseConfig": {
-             ...
-           }
-         }
-       }
-     }
-     ```
-     Access in code: 
-     ```typescript
-     import Constants from 'expo-constants';
-     
-     const apiUrl = Constants.expoConfig?.extra?.apiUrl;
-     const useSampleData = Constants.expoConfig?.extra?.useSampleData;
-     ```
-

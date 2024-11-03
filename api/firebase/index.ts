@@ -1,23 +1,6 @@
 import { Platform } from 'react-native';
+import { AuthUser } from '../types/firebase';
 //import Constants from 'expo-constants';
-
-export interface AuthUser {
-  uid: string;
-  email: string | null;
-}
-
-export interface FirebaseTimestamp {
-  toDate: () => Date;
-  seconds: number;
-  nanoseconds: number;
-}
-
-export interface UserData {
-  email: string;
-  firstname: string;
-  lastname: string;
-  createdAt: FirebaseTimestamp;
-}
 
 export interface FirebaseService {
   auth: {
@@ -32,19 +15,6 @@ export interface FirebaseService {
     getUserData: (uid: string) => Promise<any>;
     updateUser: (uid: string, userData: any) => Promise<void>;
   };
-}
-
-// Initialize Firebase configuration
-//export const firebaseConfig = Constants.expoConfig?.extra?.firebaseConfig;
-export const firebaseConfig = {
-    apiKey: "AIzaSyDDoY2mB3tR2J-QbwihPJLoSH3ya9CBRrY",
-    authDomain: "mech-2b0ad.firebaseapp.com",
-    projectId: "mech-2b0ad",
-    storageBucket: "mech-2b0ad.appspot.com",
-    messagingSenderId: "396836920221",
-    appId: "1:396836920221:web:ff4b5759f0dad6960fed74",
-    measurementId: "G-SE4L1C13PR",
-    databaseURL: "https://default.nam5.firebasedatabase.app"
 }
 
 // Platform-specific implementation will be imported

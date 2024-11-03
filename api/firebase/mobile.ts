@@ -1,6 +1,6 @@
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import { FirebaseService, AuthUser } from './index';
+import { FirebaseService } from './index';
 
 const mobileFirebaseService: FirebaseService = {
   auth: {

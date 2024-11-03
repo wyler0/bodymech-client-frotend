@@ -2,7 +2,7 @@ import { Redirect } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { View, Text } from 'react-native';
 import firebaseService from '../api/firebase';
-import { AuthUser } from '../api/firebase';
+import { AuthUser } from '../api/types/firebase';
 
 // Used to set the default route to the growth dashboard
 export default function Index() {
