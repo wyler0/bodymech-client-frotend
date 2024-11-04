@@ -5,6 +5,8 @@ import {
   createUserWithEmailAndPassword,
   onAuthStateChanged as fbOnAuthStateChanged,
   signOut as fbSignOut,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from 'firebase/auth';
 import {
   getFirestore,
@@ -51,6 +53,30 @@ const webFirebaseService: FirebaseService = {
     getCurrentUser: () => {
       const user = auth.currentUser;
       return user ? { uid: user.uid, email: user.email } : null;
+    },
+    signInWithGoogle: async () => {
+      const provider = new GoogleAuthProvider();
+      const auth = getAuth();
+      auth.languageCode = 'en'; // Set language to English
+      
+      try {
+        const result = await signInWithPopup(auth, provider);
+        //https://stackoverflow.com/questions/46314056/how-to-get-just-the-first-name-when-a-user-logs-in-using-social-media-with-fireb
+        const name = result.user.displayName; 
+        const photoURL = result.user.photoURL;
+        const providerId = result.user.providerId;
+        const phoneNumber = result.user.phoneNumber;
+
+        return {
+          uid: result.user.uid,
+          email: result.user.email,
+        };
+      } catch (error: any) {
+        if (error.code === 'auth/account-exists-with-different-credential') {
+          throw new Error('An account already exists with the same email address but different sign-in credentials.');
+        }
+        throw error;
+      }
     },
   },
   firestore: {

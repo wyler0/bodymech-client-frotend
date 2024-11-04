@@ -9,6 +9,7 @@ export interface FirebaseService {
     signOut: () => Promise<void>;
     onAuthStateChanged: (callback: (user: AuthUser | null) => void) => () => void;
     getCurrentUser: () => AuthUser | null;
+    signInWithGoogle: () => Promise<AuthUser>;
   };
   firestore: {
     createUser: (uid: string, userData: any) => Promise<void>;

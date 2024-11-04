@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, Alert } from 'react-native';
+import { View, TextInput, Button, StyleSheet, Text, Platform } from 'react-native';
 import auth from '@react-native-firebase/auth';
 
 import alert from '../../patches/alert';
@@ -11,6 +11,30 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const router = useRouter();
 
+  const createUserDataIfNeeded = async (user: { uid: string, email: string | null }) => {
+    try {
+      const existingData = await firebaseService.firestore.getUserData(user.uid);
+      
+      if (!existingData) {
+        await firebaseService.firestore.createUser(user.uid, {
+          email: user.email,
+          firstname: user, // Default name
+          lastname: '',
+          createdAt: new Date(),
+          lastLogin: new Date(),
+        });
+      } else {
+        // Update last login
+        await firebaseService.firestore.updateUser(user.uid, {
+          lastLogin: new Date(),
+        });
+      }
+    } catch (error) {
+      console.error('Error handling user data:', error);
+      // Don't throw - we still want to proceed with navigation
+    }
+  };
+
   const handleLogin = async () => {
     try {
       if (!email || !password) {
@@ -19,13 +43,32 @@ export default function Login() {
       }
       
       await firebaseService.auth.signIn(email, password);
-      console.log('Login successful');
+      const currentUser = firebaseService.auth.getCurrentUser();
+      
+      if (currentUser) {
+        await createUserDataIfNeeded(currentUser);
+      }
       router.replace('/(tabs)/(growth dashboard)');
     } catch (error) {
       console.error('Login error:', error);
       alert('Login Failed', 'Invalid email or password. Please try again.');
     }
-};
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      if (Platform.OS === 'web') {
+        const user = await firebaseService.auth.signInWithGoogle();
+        await createUserDataIfNeeded(user);
+        router.replace('/(tabs)/(growth dashboard)');
+      } else {
+        alert('Not Available', 'Google sign-in is not available on mobile devices yet.');
+      }
+    } catch (error) {
+      console.error('Google login error:', error);
+      alert('Login Failed', 'Google sign-in failed. Please try again.');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -46,6 +89,9 @@ export default function Login() {
         secureTextEntry
       />
       <Button title="Login" onPress={handleLogin} />
+      {Platform.OS === 'web' && (
+        <Button title="Sign in with Google" onPress={handleGoogleLogin} />
+      )}
       <Button title="Register" onPress={() => router.push('/register')} />
     </View>
   );

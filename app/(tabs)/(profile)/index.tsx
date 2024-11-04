@@ -25,11 +25,9 @@ export default function ProfileScreen() {
 
   const fetchUserData = async (uid: string) => {
     try {
-      console.log('Fetching user data for UID:', uid);
       const data = await firebaseService.firestore.getUserData(uid);
       
       if (data) {
-        console.log('User data:', data);
         setUserData(data as UserData);
       } else {
         alert('Error', 'User data not found');
