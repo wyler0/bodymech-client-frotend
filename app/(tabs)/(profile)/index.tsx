@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Button, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Button, ActivityIndicator, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import alert from '../../../patches/alert';
 import firebaseService from '../../../api/firebase';
@@ -63,7 +63,13 @@ export default function ProfileScreen() {
       <Text style={styles.title}>Profile</Text>
       {userData ? (
         <View>
-          <Text style={styles.info}>Name: {userData.firstname} {userData.lastname}</Text>
+          {userData.photoURL && (
+            <Image 
+              source={{ uri: userData.photoURL }} 
+              style={styles.profileImage}
+            />
+          )}
+          <Text style={styles.info}>Name: {userData.name}</Text>
           <Text style={styles.info}>Email: {userData.email}</Text>
           <Text style={styles.info}>
             Account created: {userData.createdAt?.toDate().toLocaleDateString() || 'N/A'}
@@ -92,5 +98,11 @@ const styles = StyleSheet.create({
   info: {
     fontSize: 16,
     marginBottom: 10,
+  },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 20,
   },
 });

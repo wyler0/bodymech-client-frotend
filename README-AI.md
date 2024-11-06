@@ -161,6 +161,60 @@ Authentication in the application is implemented using Firebase with platform-sp
      - Account creation date
    - Handles logout functionality
 
+5. **Profile Photo Management**
+   - Profile photos are handled through a multi-step process using Firebase Storage and Authentication:
+
+     1. **Storage Configuration**
+        - Photos stored in Firebase Storage under 'profile-photos/{uid}'
+        - CORS enabled for development domains:
+          - localhost:8081 (Expo dev server)
+          - localhost:19006 (Expo web)
+          - localhost:3000 (Alternative dev port)
+        - Security rules:
+          - Public read access for all files
+          - Write access restricted to authenticated users
+          - File uploads limited to images under 5MB
+
+     2. **Upload Process**
+        - User selects photo during registration (optional)
+        - Image is compressed and cropped to 1:1 aspect ratio
+        - Uploaded to Firebase Storage
+        - Download URL stored in both:
+          - Firebase Auth profile (photoURL field)
+          - Firestore user document
+
+     3. **User Data Structure Update**
+        ```typescript
+        interface UserData {
+          email: string;
+          fullName: string;
+          photoURL: string | null;
+          createdAt: FirebaseTimestamp;
+          lastLogin: FirebaseTimestamp;
+        }
+        ```
+
+     4. **Firebase Service Interface Update**
+        ```typescript
+        interface FirebaseService {
+          auth: {
+            // ... existing methods ...
+            updateProfile: (uid: string, data: { 
+              photoURL?: string | null, 
+              displayName?: string 
+            }) => Promise<void>;
+          };
+          storage: {
+            uploadProfilePhoto: (uid: string, file: File | Blob) => Promise<string>;
+          };
+        }
+        ```
+
+     5. **Error Handling**
+        - Upload failures trigger appropriate error messages
+        - Updates are atomic - if any step fails, the user is notified
+        - CORS errors handled through proper Storage configuration
+
 ### User Data Structure
 
 ```typescript

@@ -11,8 +11,8 @@ export interface AuthUser {
   
   export interface UserData {
     email: string;
-    firstname: string;
-    lastname: string;
+    name: string;
+    photoURL: string;
     createdAt: FirebaseTimestamp;
   }
   
