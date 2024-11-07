@@ -59,17 +59,7 @@
     },
     "extra": {
       "apiUrl": "https://api.yourapp.com",
-      "useSampleData": true,
-      "firebaseConfig": {
-        "FIREBASE_API_KEY": "AIzaSyDDoY2mB3tR2J-QbwihPJLoSH3ya9CBRrY",
-        "FIREBASE_AUTH_DOMAIN": "mech-2b0ad.firebaseapp.com",
-        "FIREBASE_PROJECT_ID": "mech-2b0ad",
-        "FIREBASE_STORAGE_BUCKET": "mech-2b0ad.appspot.com",
-        "FIREBASE_MESSAGING_SENDER_ID": "396836920221",
-        "FIREBASE_APP_ID": "1:396836920221:web:ff4b5759f0dad6960fed74",
-        "FIREBASE_MEASUREMENT_ID": "G-SE4L1C13PR",
-        "FIREBASE_DATABASE_URL": "https://default.nam5.firebasedatabase.app"
-      }
+      "useSampleData": true
     },
     "entryPoint": "./index.js"
   }
