@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import { AuthUser } from '../types/firebase';
+import { AuthUser, WebUploadType, MobileUploadType } from '../types/firebase';
 //import Constants from 'expo-constants';
 
 export interface FirebaseService {
@@ -18,7 +18,7 @@ export interface FirebaseService {
     updateUser: (uid: string, userData: any) => Promise<void>;
   };
   storage: {
-    uploadProfilePhoto: (uid: string, file: File | Blob) => Promise<string>;
+    uploadProfilePhoto: (uid: string, file: WebUploadType | MobileUploadType) => Promise<string>;
   };
 }
 

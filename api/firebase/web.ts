@@ -14,7 +14,6 @@ import {
   doc,
   setDoc,
   getDoc,
-  collection,
 } from 'firebase/firestore';
 import {
   getStorage,
@@ -23,6 +22,7 @@ import {
   getDownloadURL,
 } from 'firebase/storage';
 import { FirebaseService } from './index';
+import { WebUploadType, MobileUploadType } from '../types/firebase';
 
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
@@ -121,7 +121,14 @@ const webFirebaseService: FirebaseService = {
     },
   },
   storage: {
-    uploadProfilePhoto: async (uid: string, file: File | Blob) => {
+    uploadProfilePhoto: async (
+      uid: string, 
+      file: WebUploadType | MobileUploadType
+    ): Promise<string> => {
+      if (!('type' in file)) {
+        throw new Error('Invalid file type for web upload');
+      }
+
       const photoRef = storageRef(storage, `profile-photos/${uid}`);
       await uploadBytes(photoRef, file);
       const downloadURL = await getDownloadURL(photoRef);

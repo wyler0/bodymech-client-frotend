@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, Platform } from 'react-native';
-import auth from '@react-native-firebase/auth';
-
+import { View, TextInput, Button, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import alert from '../../patches/alert';
 import { useRouter } from 'expo-router';
 import firebaseService from '../../api/firebase';
@@ -57,13 +55,9 @@ export default function Login() {
 
   const handleGoogleLogin = async () => {
     try {
-      if (Platform.OS === 'web') {
-        const user = await firebaseService.auth.signInWithGoogle();
-        await createUserDataIfNeeded(user);
-        router.replace('/(tabs)/(growth dashboard)');
-      } else {
-        alert('Not Available', 'Google sign-in is not available on mobile devices yet.');
-      }
+      const user = await firebaseService.auth.signInWithGoogle();
+      await createUserDataIfNeeded(user);
+      router.replace('/(tabs)/(growth dashboard)');
     } catch (error) {
       console.error('Google login error:', error);
       alert('Login Failed', 'Google sign-in failed. Please try again.');
@@ -89,9 +83,12 @@ export default function Login() {
         secureTextEntry
       />
       <Button title="Login" onPress={handleLogin} />
-      {Platform.OS === 'web' && (
-        <Button title="Sign in with Google" onPress={handleGoogleLogin} />
-      )}
+      <TouchableOpacity 
+        style={styles.googleButton}
+        onPress={handleGoogleLogin}
+      >
+        <Text style={styles.googleButtonText}>Sign in with Google</Text>
+      </TouchableOpacity>
       <Button title="Register" onPress={() => router.push('/register')} />
     </View>
   );
@@ -115,5 +112,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 12,
     paddingLeft: 8,
+  },
+  googleButton: {
+    backgroundColor: '#4285F4',
+    padding: 12,
+    borderRadius: 4,
+    marginVertical: 8,
+  },
+  googleButtonText: {
+    color: 'white',
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
 });

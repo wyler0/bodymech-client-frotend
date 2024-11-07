@@ -21,6 +21,7 @@ export default function Register() {
         aspect: [1, 1],
         quality: 0.5,
       });
+      console.log('Result:', result);
 
       if (!result.canceled) {
         setPhoto(result.assets[0].uri);
@@ -33,13 +34,15 @@ export default function Register() {
 
   const uploadPhoto = async (uid: string, uri: string): Promise<string> => {
     try {
-      // Convert image URI to blob for web
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      
-      // Upload to Firebase Storage
-      const photoURL = await firebaseService.storage.uploadProfilePhoto(uid, blob);
-      return photoURL;
+      if (Platform.OS === 'web') {
+        // For web: Convert image URI to blob
+        const response = await fetch(uri);
+        const blob = await response.blob();
+        return await firebaseService.storage.uploadProfilePhoto(uid, blob);
+      } else {
+        // For mobile: Pass the file object with uri
+        return await firebaseService.storage.uploadProfilePhoto(uid, { uri });
+      }
     } catch (error) {
       console.error('Error uploading photo:', error);
       throw new Error('Failed to upload profile photo');

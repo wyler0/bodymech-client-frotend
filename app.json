@@ -40,12 +40,14 @@
       "@react-native-firebase/auth",
       "@react-native-firebase/crashlytics",
       "expo-secure-store",
+      "expo-image-picker",
       [
         "expo-build-properties",
         {
           "ios": {
             "useFrameworks": "static",
-            "faceIdPermissions": "Allow us to access your Face ID."
+            "faceIdPermissions": "Allow us to access your Face ID.",
+            "photosPermissions": "Allow us to access your photos."
           }
         }
       ],
